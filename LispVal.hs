@@ -2,6 +2,8 @@ module Main where
 import Text.ParserCombinators.Parsec hiding (spaces)
 import System.Environment
 import Control.Monad
+import Debug.Trace
+
 
 symbol :: Parser Char
 symbol = oneOf "!#$%&|*+-/:<=>?@^_~"
@@ -17,13 +19,20 @@ data LispVal = Atom String
              | Number Integer
              | Bool Bool
              | String String
-
+              deriving Show
+ 
+--rescapeQuote :: Parser Char
+--escapeQuote = "\""
+--       <|> digit
+--       <|> symbol
+--       <|> letter
   
+
 --create values of the specified types--
 parseString :: Parser LispVal
 parseString = do
   char '"'
-  x <- many ( noneOf "\"" )
+  x <- many (noneOf "\"") 
   char '"'
   return $ String x --Parser action that consumes no input but returns it as the inner value, thus the 'Parser LispVal' type
 
@@ -43,14 +52,14 @@ parseNumber = do
   return $ Number (read x)
 
 parseExpr :: Parser LispVal
-parseExpr = parseAtom
+parseExpr = parseString
+         <|> parseAtom
          <|> parseNumber
-         <|> parseString
 
 readExpr :: String -> String 
 readExpr input = case parse parseExpr "lisp" input of
   Left err -> "No match: " ++ show err 
-  Right val -> "Found value" 
+  Right val -> "Found value: " ++ show val 
 
 main :: IO ()
 main = do
