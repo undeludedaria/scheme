@@ -10,7 +10,7 @@ symbol = oneOf "!#$%&|*+-/:<=>?@^_~"
 
 --ignore first space
 spaces :: Parser ()
-spaces = skipMany1 space
+spaces = skipMany space
 
 --universal data type
 data LispVal = Atom String
@@ -57,7 +57,7 @@ parseExpr = parseString
          <|> parseNumber
 
 readExpr :: String -> String 
-readExpr input = case parse parseExpr "lisp" input of
+readExpr input = case parse (spaces >> parseExpr) "lisp" input of
   Left err -> "No match: " ++ show err 
   Right val -> "Found value: " ++ show val 
 
