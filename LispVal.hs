@@ -20,19 +20,20 @@ data LispVal = Atom String
              | Bool Bool
              | String String
               deriving Show
- 
---rescapeQuote :: Parser Char
---escapeQuote = "\""
---       <|> digit
---       <|> symbol
---       <|> letter
+
+
+escapeQuote :: Parser Char 
+escapeQuote = char '\\'
+           <|> digit
+           <|> symbol
+           <|> letter
   
 
 --create values of the specified types--
 parseString :: Parser LispVal
 parseString = do
   char '"'
-  x <- many (noneOf "\"") 
+  x <- many (escapeQuote) 
   char '"'
   return $ String x --Parser action that consumes no input but returns it as the inner value, thus the 'Parser LispVal' type
 
@@ -52,8 +53,8 @@ parseNumber = do
   return $ Number (read x)
 
 parseExpr :: Parser LispVal
-parseExpr = parseString
-         <|> parseAtom
+parseExpr = parseAtom
+         <|> parseString 
          <|> parseNumber
 
 readExpr :: String -> String 
